@@ -4,18 +4,36 @@
 
 # pySigma ocsf Backend
 
-This is the ocsf backend for pySigma. It provides the package `sigma.backends.ocsf` with the `ocsfBackend` class.
-Further, it contains the following processing pipelines in `sigma.pipelines.ocsf`:
+This is the OCSF processing pipeline for pySigma. It provides the package `sigma.pipeline.ocsf` with the `ocsf_pipeline` function that returns a ProcessingPipeline object.
 
-* pipeline1: purpose
-* pipeline2: purpose
+Currently the pipeline adds support for the following event types (Sigma logsource category to OCSF class mapping):
 
-It supports the following output formats:
+* application
+* antivirus
+* create_stream_hash
+* dns
+* dns_query
+* driver_load
+* firewall
+* file_access
+* file_change
+* file_delete
+* file_event
+* file_executable_detected
+* file_rename
+* image_load
+* network_connection
+* process_access
+* process_creation
+* process_tampering
+* process_termination
+* registry_add
+* registry_delete
+* registry_event
+* registry_rename
+* registry_set
+* sysmon_error
 
-* default: plain ocsf queries
-* format_1: purpose
-* format_2: purpose
+This pipeline is currently maintained by:
 
-This backend is currently maintained by:
-
-* [Hendrik Baecker](https://github.com/SigmaHQ/)
+* [Hendrik Baecker](https://github.com/andurin/)
