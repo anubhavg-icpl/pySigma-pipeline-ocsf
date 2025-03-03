@@ -1,5 +1,5 @@
 ![Tests](https://github.com/SigmaHQ/pySigma-pipeline-ocsf/actions/workflows/test.yml/badge.svg)
-![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/SigmaHQ/a90f19ae7754f8b6cb0d9a3c9f624e53/raw/SigmaHQ-pySigma-pipeline-ocsf.json)
+![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/andurin/a90f19ae7754f8b6cb0d9a3c9f624e53/raw/SigmaHQ-pySigma-pipeline-ocsf.json)
 ![Status](https://img.shields.io/badge/Status-pre--release-orange)
 
 # pySigma ocsf Backend
