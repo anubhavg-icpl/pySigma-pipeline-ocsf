@@ -30,7 +30,7 @@ jobs:
       - name: Build packages
         run: poetry build
       - name: Publish to test PyPI
-        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')}}
+        if: ${{ github.event_name == 'push'}}
         uses: pypa/gh-action-pypi-publish@v1.12.4
         with:
           repository-url: https://test.pypi.org/legacy/
