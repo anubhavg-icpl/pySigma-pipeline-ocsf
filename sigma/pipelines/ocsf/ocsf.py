@@ -660,5 +660,33 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 ),
                 rule_conditions=[LogsourceCondition(category="wmi_event")],
             )
+        ]
+        + [
+            ProcessingItem(  # Field mappings for windows security)
+                identifier="ocsf_field_mappings_windows_security",
+                transformation=FieldMappingTransformation(
+                    {
+                        "EventID": "metadata.event_code",
+                        "Destination": "Destination",
+                        "LogonType": "logon_type_id",
+                        "IpAddress": "src_endpoint.ip",
+                        "ServiceFileName": "win_service.name",
+                    }
+                ),
+                rule_conditions=[
+                    LogsourceCondition(product="windows"),
+                    LogsourceCondition(service="security"),
+                ],
+            )
+        ]
+        # Convert EventID aka metadata.event_code to str
+        + [
+            ProcessingItem(
+                identifier="ocsf_change_field_mapping_to_str",
+                transformation=ConvertTypeTransformation("str"),
+                field_name_conditions=[
+                    IncludeFieldCondition(fields=["metadata.event_code"])
+                ],
+            )
         ],
     )
