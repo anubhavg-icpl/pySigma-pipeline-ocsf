@@ -2,12 +2,34 @@ from sigma.pipelines.base import Pipeline
 from sigma.processing.transformations import (
     AddConditionTransformation,
     FieldMappingTransformation,
+    ConvertTypeTransformation,
 )
 
-from sigma.processing.conditions import LogsourceCondition
+from sigma.processing.conditions import (
+    LogsourceCondition,
+    IncludeFieldCondition,
+    RuleContainsFieldCondition,
+    RuleContainsDetectionItemCondition,
+)
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
 
-ocsf_generic_logsource_mapping = {  # map generic Sigma log sources to OCSF Categories and Activities
+
+# Contains windows mappings in form of:
+# {product: {service: {eventid: {field: value}}}}
+ocsf_windows_eventid_mapping = {
+    "windows": {
+        "security": {
+            4624: {"class_uid": 3002, "category_uid": 3, "activity_id": 1},
+            4625: {"class_uid": 3002, "category_uid": 3, "activity_id": 1},
+            4697: {"class_uid": 201004, "category_uid": 1, "activity_id": 1},
+        },
+        "system": {
+            7045: {"class_uid": 201004, "category_uid": 1, "activity_id": 1},
+        },
+    }
+}
+
+ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source categories to OCSF Categories and Activities
     "application": {
         "class_uid": 6002,
         "category_uid": 6,
@@ -94,9 +116,33 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 ),
                 rule_conditions=[LogsourceCondition(category=log_source)],
             )
-            for log_source, mappeddata in ocsf_generic_logsource_mapping.items()
+            for log_source, mappeddata in ocsf_generic_logsource_category_mapping.items()
             for field, value in sorted(mappeddata.items())
         ]
+        # Create processing items for Windows according to Service and EventID
+        + [
+            ProcessingItem(
+                identifier=f"ocsf_{mappedproduct}_{mappedservice}_{mappedeventid}_{field}",
+                transformation=AddConditionTransformation(
+                    {
+                        field: value,
+                    }
+                ),
+                rule_conditions=[
+                    LogsourceCondition(product=mappedproduct),
+                    LogsourceCondition(service=mappedservice),
+                    RuleContainsFieldCondition(field="EventID"),
+                    RuleContainsDetectionItemCondition(
+                        field="EventID", value=mappedeventid
+                    ),
+                ],
+            )
+            for mappedproduct, servicedata in ocsf_windows_eventid_mapping.items()
+            for mappedservice, eventiddata in servicedata.items()
+            for mappedeventid, mappeddata in eventiddata.items()
+            for field, value in sorted(mappeddata.items())
+        ]
+        # Field mappings for categories
         + [
             ProcessingItem(  # Field mappings for application)
                 identifier="ocsf_field_mappings_application",
