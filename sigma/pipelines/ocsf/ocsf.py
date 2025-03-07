@@ -53,7 +53,11 @@ ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source cate
     "file_change": {"class_uid": 1001, "category_uid": 1, "activity_id": 3},
     "file_delete": {"class_uid": 1001, "category_uid": 1, "activity_id": 4},
     "file_event": {"class_uid": 1001, "category_uid": 1, "activity_id": 1},
-    "file_executable_detected": {"class_uid": 1001, "category_uid": 1, "activity_id": 1},
+    "file_executable_detected": {
+        "class_uid": 1001,
+        "category_uid": 1,
+        "activity_id": 1,
+    },
     "file_rename": {"class_uid": 1001, "category_uid": 1, "activity_id": 5},
     "image_load": {
         "class_uid": 1007,
