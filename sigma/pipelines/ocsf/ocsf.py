@@ -104,7 +104,7 @@ ocsf_generic_logsource_category_mapping = {  # map generic Sigma log source cate
 }
 
 
-@Pipeline
+@Pipeline  # type: ignore
 def ocsf_pipeline() -> ProcessingPipeline:
     return ProcessingPipeline(
         name="OCSF pipeline",
@@ -666,16 +666,130 @@ def ocsf_pipeline() -> ProcessingPipeline:
                 identifier="ocsf_field_mappings_windows_security",
                 transformation=FieldMappingTransformation(
                     {
-                        "EventID": "metadata.event_code",
+                        "AccessList": "AccessList",
+                        "AccessMask": "AccessMask",
+                        "AllowedToDelegateTo": "AllowedToDelegateTo",
+                        "Application": "Application",
+                        "AttributeLDAPDisplayName": "AttributeLDAPDisplayName",
+                        "AttributeValue": "AttributeValue",
+                        "AuditPolicyChanges": "AuditPolicyChanges",
+                        "AuditSourceName": "AuditSourceName",
+                        "AuthenticationPackageName": "AuthenticationPackageName",
+                        "CertThumbprint": "CertThumbprint",
+                        "DestAddress": "DestAddress",
                         "Destination": "Destination",
-                        "LogonType": "logon_type_id",
+                        "DestPort": "DestPort",
+                        "EventID": "metadata.event_code",
+                        "FilterName": "FilterName",
+                        "FilterOrigin": "FilterOrigin",
+                        "ImpersonationLevel": "ImpersonationLevel",
                         "IpAddress": "src_endpoint.ip",
-                        "ServiceFileName": "win_service.name",
+                        "IpPort": "IpPort",
+                        "KeyLength": "KeyLength",
+                        "Keywords": "Keywords",
+                        "LayerRTID": "LayerRTID",
+                        "LogonProcessName": "LogonProcessName",
+                        "LogonType": "logon_type_id",
+                        "NewTargetUserName": "NewTargetUserName",
+                        "NewTemplateContent": "NewTemplateContent",
+                        "NewUacValue": "NewUacValue",
+                        "NewValue": "NewValue",
+                        "ObjectClass": "ObjectClass",
+                        "ObjectName": "ObjectName",
+                        "ObjectServer": "ObjectServer",
+                        "ObjectType": "ObjectType",
+                        "ObjectValueName": "ObjectValueName",
+                        "OldUacValue": "OldUacValue",
+                        "param1": "param1",
+                        "PrivilegeList": "PrivilegeList",
+                        "ProcessName": "ProcessName",
+                        "Properties": "Properties",
+                        "Provider_Name": "unmapped.SourceName",
+                        "ProviderContextName": "ProviderContextName",
+                        "RelativeTargetName": "RelativeTargetName",
+                        "SamAccountName": "SamAccountName",
+                        "Service": "Service",
+                        "ServiceFileName": "win_service.cmd_line",
+                        "ServiceName": "win_service.name",
+                        "ServicePrincipalNames": "ServicePrincipalNames",
+                        "ServiceStartType": "ServiceStartType",
+                        "ServiceType": "ServiceType",
+                        "ShareName": "ShareName",
+                        "SidHistory": "SidHistory",
+                        "SourceAddress": "SourceAddress",
+                        "SourcePort": "SourcePort",
+                        "Status": "Status",
+                        "SubcategoryGuid": "SubcategoryGuid",
+                        "SubjectDomainName": "SubjectDomainName",
+                        "SubjectLogonId": "SubjectLogonId",
+                        "SubjectUserName": "SubjectUserName",
+                        "SubjectUserSid": "SubjectUserSid",
+                        "TargetName": "TargetName",
+                        "TargetOutboundUserName": "TargetOutboundUserName",
+                        "TargetServerName": "TargetServerName",
+                        "TargetUserName": "user.name",
+                        "TargetUserSid": "TargetUserSid",
+                        "TaskContent": "TaskContent",
+                        "TaskContentNew": "TaskContentNew",
+                        "TaskName": "TaskName",
+                        "TemplateContent": "TemplateContent",
+                        "TicketEncryptionType": "TicketEncryptionType",
+                        "TicketOptions": "TicketOptions",
+                        "Workstation": "Workstation",
+                        "WorkstationName": "src_endpoint.name",
                     }
                 ),
                 rule_conditions=[
                     LogsourceCondition(product="windows"),
                     LogsourceCondition(service="security"),
+                ],
+            )
+        ]
+        + [
+            ProcessingItem(  # Field mappings for windows system, eventid 7045)
+                identifier="ocsf_field_mappings_windows_system",
+                transformation=FieldMappingTransformation(
+                    {
+                        "EventID": "metadata.event_code",
+                        "ImagePath": "win_service.cmd_line",
+                        "ServiceName": "win_service.name",
+                        "AccountName": "unmapped.service_account_name",
+                    }
+                ),
+                rule_conditions=[
+                    LogsourceCondition(product="windows"),
+                    LogsourceCondition(service="system"),
+                    RuleContainsFieldCondition(field="EventID"),
+                    RuleContainsDetectionItemCondition(field="EventID", value=7045),
+                ],
+            )
+        ]
+        + [
+            ProcessingItem(  # Field mappings for windows system)
+                identifier="ocsf_field_mappings_windows_system",
+                transformation=FieldMappingTransformation(
+                    {
+                        "AccountName": "unmapped.AccountName",
+                        "Caption": "unmapped.Caption",
+                        "Channel": "unmapped.Channel",
+                        "Description": "unmapped.Description",
+                        "DeviceName": "unmapped.DeviceName",
+                        "EventID": "metadata.event_code",
+                        "HiveName": "unmapped.HiveName",
+                        "ImagePath": "unmapped.ImagePath",
+                        "Level": "unmapped.Level",
+                        "Origin": "unmapped.Origin",
+                        "param1": "unmapped.param1",
+                        "param2": "unmapped.param2",
+                        "param3": "unmapped.param3",
+                        "ProcessId": "unmapped.ProcessId",
+                        "Provider_Name": "metadata.log_provider",
+                        "ServiceName": "unmapped.ServiceName",
+                    }
+                ),
+                rule_conditions=[
+                    LogsourceCondition(product="windows"),
+                    LogsourceCondition(service="system"),
                 ],
             )
         ]
