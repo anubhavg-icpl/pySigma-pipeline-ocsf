@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 # linux_threat_hunting.py
 
-import subprocess
 import json
 from pathlib import Path
+from sigma.collection import SigmaCollection
+from sigma.backends.test import TextQueryTestBackend
+from sigma.pipelines.ocsf import ocsf_pipeline
 
 class LinuxThreatHunter:
     def __init__(self):
         self.backend = TextQueryTestBackend(ocsf_pipeline())
-    
+
     def common_linux_attacks(self):
         """Generate OCSF queries for common Linux attack patterns"""
-        
+
         attack_patterns = {
             "reverse_shell": """
 title: Linux Reverse Shell Detection
@@ -72,18 +74,21 @@ detection:
     condition: sel
 """
         }
-        
+
         ocsf_rules = {}
         for attack_type, rule_yaml in attack_patterns.items():
-            rule = SigmaCollection.from_yaml(rule_yaml)
-            ocsf_rules[attack_type] = self.backend.convert(rule)
-        
+            try:
+                rule = SigmaCollection.from_yaml(rule_yaml)
+                ocsf_rules[attack_type] = self.backend.convert(rule)
+            except Exception as e:
+                print(f"Failed to convert {attack_type}: {e}")
+
         return ocsf_rules
-    
+
     def export_for_siem(self, output_file: str = "linux_threats_ocsf.json"):
         """Export Linux threat hunting rules in OCSF format for SIEM integration"""
         rules = self.common_linux_attacks()
-        
+
         export_data = {
             "metadata": {
                 "description": "Linux threat hunting rules in OCSF format",
@@ -92,7 +97,7 @@ detection:
             },
             "rules": []
         }
-        
+
         for attack_type, queries in rules.items():
             for i, query in enumerate(queries):
                 export_data["rules"].append({
@@ -101,21 +106,32 @@ detection:
                     "ocsf_query": query,
                     "severity": self._get_severity(attack_type)
                 })
-        
+
         with open(output_file, 'w') as f:
             json.dump(export_data, f, indent=2)
-        
+
         print(f"Exported {len(export_data['rules'])} Linux threat hunting rules to {output_file}")
-    
+        return export_data
+
     def _get_severity(self, attack_type: str) -> str:
         severity_map = {
             "reverse_shell": "high",
-            "persistence_mechanisms": "medium", 
+            "persistence_mechanisms": "medium",
             "lateral_movement": "medium",
             "data_exfiltration": "high"
         }
         return severity_map.get(attack_type, "medium")
 
 # Usage
-hunter = LinuxThreatHunter()
-hunter.export_for_siem("arch_linux_threats.json")
+if __name__ == "__main__":
+    hunter = LinuxThreatHunter()
+
+    # Display all attack patterns
+    rules = hunter.common_linux_attacks()
+    for attack_type, queries in rules.items():
+        print(f"\n=== {attack_type.upper().replace('_', ' ')} ===")
+        for query in queries:
+            print(query)
+
+    # Export to JSON file
+    hunter.export_for_siem("arch_linux_threats.json")
