@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+from sigma.collection import SigmaCollection
+from sigma.backends.test import TextQueryTestBackend
+from sigma.pipelines.ocsf import ocsf_pipeline
+
+backend = TextQueryTestBackend(ocsf_pipeline())
+
 # Detect suspicious network connections
 linux_network_rule = """
 title: Suspicious Linux Network Connection
